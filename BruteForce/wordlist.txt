@@ -1,0 +1,8 @@
+dpak
+file
+linux
+kali
+apple
+mango
+python
+india
