@@ -26,18 +26,18 @@ try:
     server=smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
     server.login("dpakverma1234@gmail.com", "urlove4mine")
-    print("\n", ("\t")*4, "WAIT FOR A MOMENT")
+    print("\n", "\t"*4, "WAIT FOR A MOMENT")
     server.send_message(msg)
-    print("\n", ("\t")*3, "=== OTP SENT SUCCESSFULLY ===")
+    print("\n", "\t"*3, "=== OTP SENT SUCCESSFULLY ===")
     server.quit()
     time.sleep(2)
     otp = input("\n\nENTER OTP :")
     if otp == get_password:
-        print("\n", ("\t")*3, "=== EMAIL VERIFIED ===")
+        print("\n", "\t"*3, "=== EMAIL VERIFIED ===")
     else:
-        print("\n", ("\t")*3, "=== INVALID OTP ===")
+        print("\n", "\t"*3, "=== INVALID OTP ===")
 except:
-    print("\n", ("\t")*3, "=== OTP SENT FAILED ===")
+    print("\n", "\t"*3, "=== OTP SENT FAILED ===")
     
 
 
