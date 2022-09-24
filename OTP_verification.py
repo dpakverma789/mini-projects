@@ -20,7 +20,7 @@ get_password = password_generator()
 
 try:
     msg = MIMEText("Your OTP is- "+get_password)
-    msg["from"] = "dpakverma1234@gmail.com"
+    msg["from"] = os.environ['EMAIL']
     To = input("\nENTER YOUR EMAIL: ")
     msg["to"] = To
     msg["Subject"] = "OTP VERIFICATION"
