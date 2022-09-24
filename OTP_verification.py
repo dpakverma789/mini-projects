@@ -4,6 +4,7 @@ import random
 import time
 import smtplib
 from email.mime.text import MIMEText
+import os
 
 
 def password_generator():
@@ -25,7 +26,7 @@ try:
     msg["Subject"] = "OTP VERIFICATION"
     server=smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
-    server.login("dpakverma1234@gmail.com", "urlove4mine")
+    server.login(os.environ['EMAIL'], os.environ['PASSWORD'])
     print("\n", "\t"*4, "WAIT FOR A MOMENT")
     server.send_message(msg)
     print("\n", "\t"*3, "=== OTP SENT SUCCESSFULLY ===")
