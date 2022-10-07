@@ -32,14 +32,7 @@ class VideoInfo:
                 break
             else:
                 generate_file_name += i
-        try:
-            rename = input('Want to rename file? Y/N')
-            if rename.lower() == 'y':
-                generate_file_name = input('Enter name for the file: ')
-        except ValueError:
-            print('Invalid input')
-        else:
-            return generate_file_name
+        return generate_file_name
 
 
 class VideoLengthCalculator:
@@ -89,9 +82,9 @@ if __name__ == '__main__':
                 print('\nTitle: ', media_title, '\nLength: ', media_length.video_length())
                 comp = Comparator(choice, media_title, media)
                 comp.com()
-                print('\n**** FILE DOWNLOADED On Your Desktop!! ****\n')
+                print('\n**** Find Your Downloaded File here "{}" ****\n'.format(download_path))
             except Exception as e:
-                print('\n\t**** Downloading Abort!! ****\n', e)
+                print('\n\t**** OOps Went Something Wrong, Downloading Abort!! ****\n', e)
         else:
             print('\n\t\t\tInvalid Operation Input!!')
 

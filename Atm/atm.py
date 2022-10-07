@@ -3,9 +3,9 @@ import os
 import json
 
 print("\t"*3, "WELCOME TO VIRTUAL ATM")
-balance_file = open(os.path.join(os.getcwd(), 'user_account.txt'), 'r', encoding='utf-8')
-user = json.loads(balance_file.readline())
-balance_file.close()
+user_data = open(os.path.join(os.getcwd(), 'user_account.txt'), 'r', encoding='utf-8')
+user = json.loads(user_data.readline())
+user_data.close()
 loop = flag = True
 
 
@@ -17,14 +17,14 @@ class ATM:
         self.is_authenticated = False
 
     def user_greeting(self, user):
-        print(f"hello, {user} hope you are doing well!\n")
+        print(f"\n\t\thello, {user} hope you are doing well!\n")
 
     def withdraw_amount(self, withdraw_amount):
         if withdraw_amount <= self.__current_balance:
             self.__current_balance -= withdraw_amount
             self.show_balance()
         else:
-            print('oops! insufficient balance!\n'.title())
+            print('\n\t\toops! insufficient balance!\n'.title())
         return self.__current_balance
 
     def deposit_amount(self, deposit_amount):
@@ -33,14 +33,14 @@ class ATM:
         return self.__current_balance
 
     def show_balance(self):
-        print(f'your Current Balance is :{self.__current_balance}\n'.title())
+        print(f'\n\t\tyour Current Balance is :{self.__current_balance}\n'.title())
 
     def authentication(self, user, passkey):
         if user == self.username and passkey == self.__pin:
             self.is_authenticated = True
-            print('{:=^40}\n'.format('you are logged in'.title()))
+            print('\n\n{:=^40}\n'.format(' you are logged in '.title()))
         else:
-            print('invalid credentials\n'.title())
+            print('\n\t\tinvalid credentials\n'.title())
         return self.is_authenticated
 
     def change_password(self, old_password, new_password, confirm_password):
@@ -50,17 +50,17 @@ class ATM:
                 user.update({'pin': new_pin})
                 fp.write(json.dumps(user))
                 fp.close()
-                print('your password has been change successfully\n')
+                print('\n\t\tyour password has been change successfully\n')
             else:
-                print("new pin and confirm pin didn't match\n")
+                print("\n\t\tnew pin and confirm pin didn't match\n")
         else:
-            print('you entered wrong pin\n')
+            print('\n\t\tyou entered wrong pin\n')
 
 
 while loop:
     try:
-        name = input('Enter Your Name: ')
-        key = int(input('Enter Your 5 digit Pin: '))
+        name = input('\n\nEnter Your Name: ')
+        key = int(input('Enter Your 4 digit Pin: '))
     except ValueError:
         print('password should in numeric value\n'.title())
         continue
@@ -70,13 +70,14 @@ while loop:
         atm.user_greeting(user['username'])
         while flag:
             print("\nPRESS 1 FOR WITHDRAW \t\t PRESS 2 FOR PIN CHANGE\t\t PRESS 3 FOR BALANCE CHECK")
-            print("\nPRESS 4 FOR DEPOSIT \t PRESS 0 FOR EXIT")
+            print("\nPRESS 4 FOR DEPOSIT \t\t PRESS 0 FOR EXIT")
             try:
-                operation = int(input('Enter you choice: '))
+                operation = int(input('\n\nEnter you choice: '))
             except ValueError:
                 print('invalid choice please select correct option\n'.title())
                 continue
             if not operation:
+                print('\n\t\tThank You for using Our Virtual ATM!\n\n')
                 flag = False
             elif operation == 1:
                 amount = int(input('Enter amount to be withdraw: '))
@@ -87,9 +88,9 @@ while loop:
                         file.write(json.dumps(user))
 
             elif operation == 2:
-                old_pin = int(input('Enter Your 5 digit old Pin: '))
-                new_pin = int(input('Enter Your 5 digit new Pin: '))
-                confirm_pin = int(input('Enter Your 5 digit confirm Pin: '))
+                old_pin = int(input('Enter Your 4 digit old Pin: '))
+                new_pin = int(input('Enter Your 4 digit new Pin: '))
+                confirm_pin = int(input('Enter Your 4 digit confirm Pin: '))
                 atm.change_password(old_pin, new_pin, confirm_pin)
 
             elif operation == 3:
@@ -104,3 +105,5 @@ while loop:
                         file.write(json.dumps(user))
             else:
                 print('{:=^40}\n'.format('invalid input'.title()))
+
+

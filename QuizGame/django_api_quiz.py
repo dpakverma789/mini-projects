@@ -10,7 +10,11 @@ except ModuleNotFoundError:
 point = 0
 incorrect_list = []
 try:
-    question = requests.get('http://127.0.0.1:7078/quiz/').json()
+    question = requests.get('https://djangoapii.herokuapp.com/quiz/').json()
+except Exception as error:
+    print('\n *** Could not connect with the API! ***')
+    # print(error)
+else:
     ids = [i for i in range(question.__len__())]
     name = input('\nEnter your Name: ')
     if question:
@@ -32,5 +36,5 @@ try:
             print("===" * 20)
         print(f'\n\n\tWell Played "{name.upper()}" Your Score is "{point}" out of "{question.__len__() * 10}"')
         print(f'\n\tYour incorrect answers are {incorrect_list}')
-except Exception as error:
-    print('Could not connect with the API! \n %s' %error)
+finally:
+    print('\n\tBye-Bye')

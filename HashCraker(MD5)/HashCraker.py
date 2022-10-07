@@ -4,12 +4,11 @@ import os
 path = os.getcwd()
 
 
-class HashCrak():
-    def __init__(self,default_wordlist, hashed_original_password):
+class HashCrak:
+    def __init__(self, default_wordlist, hashed_original_password):
         self.default_wordlist = default_wordlist
         self.hashed_original_password = hashed_original_password
-        
-        
+
     def wordlist(self):    
         result = False
         try:
@@ -21,8 +20,8 @@ class HashCrak():
                         result = True
                         print('\nCracked the Hash, Password is : '+word+' : '+self.hashed_original_password)
                         break
-                if result == False:
-                    print('\nNo Password Found for this hash :',self.hashed_original_password)
+                if not result:
+                    print('\nNo Password Found for this hash :', self.hashed_original_password)
         except FileNotFoundError:
             print('OOps!! WordList Do not exist!!')
 
@@ -35,7 +34,7 @@ if __name__ == "__main__":
             try:
                 choice = int(input("\nENTER YOUR CHOICE HERE :"))
                 flg = False
-            except:
+            except ValueError:
                 print('\n\t\tEnter input in Numeric Form')
         if choice in (1, 2):
             default_wordlist = input('\nEnter YOur WordList path with name if any: ')
