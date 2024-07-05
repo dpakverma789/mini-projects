@@ -1,8 +1,7 @@
-
 import os
 import json
 
-print("\t"*3, "WELCOME TO VIRTUAL ATM")
+print("\n\t"*3, "WELCOME TO VIRTUAL ATM")
 user_data = open(os.path.join(os.getcwd(), 'user_account.txt'), 'r', encoding='utf-8')
 user = json.loads(user_data.readline())
 user_data.close()
@@ -67,6 +66,7 @@ while loop:
     atm = ATM(user['username'], int(user['pin']), int(user['balance']))
     is_authenticated = atm.authentication(name, key)
     if is_authenticated:
+        flag = True
         atm.user_greeting(user['username'])
         while flag:
             print("\nPRESS 1 FOR WITHDRAW \t\t PRESS 2 FOR PIN CHANGE\t\t PRESS 3 FOR BALANCE CHECK")
@@ -77,7 +77,8 @@ while loop:
                 print('invalid choice please select correct option\n'.title())
                 continue
             if not operation:
-                print('\n\t\tThank You for using Our Virtual ATM!\n\n')
+                print('\n\t\t====== You have been Logged OUT ======')
+                print('\t\tThank You for using Our Virtual ATM!\n\n')
                 flag = False
             elif operation == 1:
                 amount = int(input('Enter amount to be withdraw: '))
@@ -105,5 +106,3 @@ while loop:
                         file.write(json.dumps(user))
             else:
                 print('{:=^40}\n'.format('invalid input'.title()))
-
-

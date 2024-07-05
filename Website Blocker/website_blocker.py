@@ -1,14 +1,16 @@
 
+import os
+os.chdir('F:\python_programs\Website Blocker')
 try:
-    import os
     import platform
     import hashlib
     import pytz
     from datetime import datetime
 except ModuleNotFoundError:
-    import os
-    for pack in ('hashlib', 'pytz'):
-        os.system(f'pip install {pack}')
+    # with open(os.path.join(os.getcwd(), 'requirements.txt')) as file:
+    #     package = [pack.strip('\n') for pack in file.readlines()]
+    #     for pack in package:
+    #         os.system(f'pip install {pack}')
     import platform
     import hashlib
     import pytz
@@ -36,15 +38,13 @@ is_windows_os = True if platform.system() == 'Windows' else False
 # selecting path according to OS
 if is_windows_os:
     hosts_path = "C:\\Windows\\System32\\drivers\\etc\\hosts"
-    # export_path = 'C:\\Users\\DEEPAK-PC\\Downloads\\'
-    export_path = 'P:\\Dpak\\'
+    export_path = 'C:\\Users\\%s\\Downloads' % os.getlogin()
 else:
     hosts_path = "/etc/hosts"
-    export_path = '/home/deepak/Downloads/'
+    export_path = '/home/%s/Downloads/' % os.getlogin()
 
 # localhost IP
 redirect = "127.0.0.1"
-hash = 'cecff118d197c988ada7067733a45863'
 
 
 # write website to host file
@@ -72,35 +72,30 @@ def write(hosts_path, website_list, flag, redirect, is_windows_os) -> None:
 
 
 # delete website from the host file
-def delete() -> None:
+def delete(args) -> None:
     string = input('\n\nEnter the Website which Should be Un-Blocked: ')
-    password = input('\n\nEnter master-Password to Un-Blocked: ')
-    if hash == hashlib.md5(password.encode()).hexdigest():
+    if is_windows_os:
+        os.system('attrib -s -r -h %s' % hosts_path)
+    try:
+        with open(hosts_path, 'r+', encoding='UTF-8') as fp:
+            file_data = fp.readlines()
+            file_data.sort()
+            content = (line for line in file_data if string not in line)
+        with open(hosts_path, 'w+', encoding='UTF-8') as fpp:
+            for i in content:
+                if i == '#':
+                    fpp.write('\n')
+                fpp.write(i)
         if is_windows_os:
-            os.system('attrib -s -r -h %s' % hosts_path)
-        try:
-            with open(hosts_path, 'r+', encoding='UTF-8') as fp:
-                file_data = fp.readlines()
-                file_data.sort()
-                content = (line for line in file_data if string not in line)
-            with open(hosts_path, 'w+', encoding='UTF-8') as fpp:
-                # [fpp.write('\n') if i == '#' else fpp.write(i) for i in content]
-                for i in content:
-                    if i == '#':
-                        fpp.write('\n')
-                    fpp.write(i)
-            if is_windows_os:
-                os.system('attrib +s +r +h %s' % hosts_path)
-            print('\n "%s" has been Un-Blocked' % string)
-            del content
-        except PermissionError as error:
-            print(error)
-    else:
-        print('\n===== Invalid Password ======')
+            os.system('attrib +s +r +h %s' % hosts_path)
+        print('\n "%s" has been Un-Blocked' % string)
+        del content
+    except PermissionError as error:
+        print(error)
 
 
 # count the number of blocked website
-def check_file() -> None:
+def check_file(args) -> None:
     try:
         if is_windows_os:
             os.system('attrib -s -r -h %s' % hosts_path)
@@ -147,11 +142,12 @@ def export_host(export_path) -> None:
             file_data.sort()
             container = (line.strip('\n').strip() for line in file_data if redirect in line
                          and 'www.' not in line)
-        with open(export_path+file_name, 'w+', encoding='UTF-8') as export:
+        export_file_path = os.path.join(export_path, file_name)
+        with open(export_file_path, 'w+', encoding='UTF-8') as export:
             for line in container:
                 export.write(line)
                 export.write('\n')
-        print(f"Export Successfully Completed, Please find your file here \"{export_path+file_name}\"")
+        print(f"Export Successfully Completed, Please find your file here \"{export_file_path}\"")
         if is_windows_os:
             os.system('attrib +s +r +h %s' % hosts_path)
         del container
@@ -160,26 +156,22 @@ def export_host(export_path) -> None:
 
 
 # websites That you want to block
+operation = {'check': check_file, 'del': delete, 'export': export_host, 'import': import_host}
 while True:
     website_list = []
+    args = None
     WebSite = input('\n\nEnter the Website which Should be Blocked: ')
     if 'www' in WebSite:
         www_WebSite = WebSite[4:]
-    elif 'check' in WebSite:
-        check_file()
-        continue
-    elif 'del' in WebSite:
-        delete()
-        continue
-    elif 'export' in WebSite:
-        export_host(export_path)
-        continue
-    elif 'import' in WebSite:
-        import_host(hosts_path, redirect, is_windows_os)
+    elif WebSite in operation.keys():
+        if WebSite == 'export':
+            args = export_path
+        if WebSite == 'import':
+            args = (hosts_path, redirect, is_windows_os)
+        operation[WebSite](args)
         continue
     else:
         www_WebSite = 'www.' + WebSite
-        
     flag = input('\nAre You sure, to update "%s" on Block-list(Yes/Y): ' % WebSite if WebSite else '-').lower()
     website_list.extend((WebSite, www_WebSite))
     if is_windows_os:

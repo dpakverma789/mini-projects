@@ -6,8 +6,16 @@ from datetime import datetime
 try:
     from playsound import playsound
 except ModuleNotFoundError:
-    os.system('pip install playsound')
-    from playsound import playsound
+    try:
+        with open(os.path.join(os.getcwd(), 'requirements.txt')) as file:
+            package = [pack.strip('\n') for pack in file.readlines()]
+        for pack in package:
+            os.system(f'pip install {pack}')
+            os.system('pip freeze > requirements.txt')
+            from playsound import playsound
+    except FileNotFoundError:
+        print('requirements.txt not found')
+        os._exit(0)
 
 
 now = datetime.now()

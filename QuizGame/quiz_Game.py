@@ -1,25 +1,31 @@
+import os
+import platform
+import random
 
 # importing packages
 try:
-    import mysql.connector as mysql
-    import random
     import psycopg2
-    import os
-    import platform
+    from dotenv import load_dotenv
 except ModuleNotFoundError:
-    import os
-    import platform
     db = 'psycopg2' if platform.system() == 'Windows' else 'psycopg2-binary'
-    for pack in ('mysql-connector-python', db):
+    for pack in (db, 'python-dotenv'):
         os.system(f'pip install {pack}')
+    import psycopg2
+    from dotenv import load_dotenv
 
 
-# database connection
 def db_connection():
-    # password = os.environ.get('database_password')
-    password = 'Dpakverma789@' if platform.system() == 'Windows' else 'root'
-    # mydb = mysql.connect(host="localhost", user="root", password=password)
-    mydb = psycopg2.connect(host="localhost", database="djanGo", user="postgres", password=password, port=5432)
+    load_dotenv()
+    db_name = os.getenv("NAME")
+    user = os.getenv("USER")
+    password = os.getenv("PASSWORD")
+    host = os.getenv("HOST")
+    mydb = psycopg2.connect(
+        host=host,
+        database=db_name,
+        user=user,
+        password=password
+    )
     return mydb, mydb.cursor()
 
 
@@ -27,36 +33,14 @@ def db_connection():
 def update_question(question, option_1, option_2, option_3, option_4, answer):
     try:
         mydb, database = db_connection()
-
-        # ---- for mysql database ----
-
-        # sql_check_db = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA
-        # WHERE SCHEMA_NAME = 'QuizGameQuestionBank'"
-        # database.execute(sql_check_db)
-        # is_database_exist = bool(database.fetchall())
-
-        # ----------------------------
         # ---- for postgres database ----
-        sql_table = "SELECT count(*) FROM information_schema.tables where table_name='questionbank_questionbank'"
+        sql_table = f"SELECT count(*) FROM information_schema.tables where table_name = 'questionbank_questionbank'"
         database.execute(sql_table)
         sql_table_exist = database.fetchall()
         # ----------------------------
 
         # if not is_database_exist:
         if not bool(sql_table_exist[0][0]):
-            # ---- for mysql database ----
-
-            # database.execute("create database QuizGameQuestionBank")
-            # sql_create_table = "CREATE TABLE QuizGameQuestionBank.QuestionBank(id int auto_increment" \
-            #                    " primary key,question varchar(500),option_1 VARCHAR(200),option_2 VARCHAR(200)," \
-            #                    "option_3 VARCHAR(200),option_4 VARCHAR(200),answer VARCHAR(200))"
-            # database.execute(sql_create_table)
-            # sql_values = (1, question, option_1, option_2, option_3, option_4, answer)
-            # sql_query = "insert into QuizGameQuestionBank.QuestionBank(id,question,option_1,option_2," \
-            #             "option_3,option_4,answer) values {}".format(sql_values)
-
-            # ----------------------------
-
             # ---- for postgres database ----
             sql_create_table = "CREATE TABLE questionbank_questionbank(id SERIAL PRIMARY KEY, question varchar(500)," \
                                "option_1 VARCHAR(200),option_2 VARCHAR(200)," \
@@ -65,21 +49,14 @@ def update_question(question, option_1, option_2, option_3, option_4, answer):
             sql_values = (question, option_1, option_2, option_3, option_4, answer)
             sql_query = "insert into questionbank_questionbank(question,option_1,option_2," \
                         "option_3,option_4,answer) values {}".format(sql_values)
-
             # ----------------------------
             database.execute(sql_query)
         else:
             sql_values = (question, option_1, option_2, option_3, option_4, answer)
-            # ---- for mysql database ----
-
-            # sql_query = "insert into QuizGameQuestionBank.QuestionBank(question,option_1,option_2," \
-            #             "option_3,option_4,answer) values {}".format(sql_values)
-
-            # ----------------------------
             # ---- for postgres database ----
             sql_query = "insert into questionbank_questionbank(question,option_1,option_2," \
                         "option_3,option_4,answer) values {}".format(sql_values)
-
+            print("\n\t\t\tPlease wait Updating Question in QuestionBank!!")
             # ----------------------------
             database.execute(sql_query)
         print("\n\t\t\tUpdated Question in QuestionBank!!\n\n")
@@ -93,15 +70,9 @@ def update_question(question, option_1, option_2, option_3, option_4, answer):
 
 # fetching questions from database
 def get_question():
-
-    # ---- for mysql database ----
-    # from_table = 'from QuizGameQuestionBank.QuestionBank'
-    # ----------------------------
-
     # ---- for postgres database ----
     from_table = 'from questionbank_questionbank'
     # ----------------------------
-
     point = 0
     incorrect_list = []
     mydb, database = db_connection()
@@ -115,14 +86,26 @@ def get_question():
             database.execute(f"select * {from_table} where id = {question_id}")
             question = database.fetchall()
             if question:
-                print('\n\n', question[0][1], '\n', 'A: ', question[0][2], '\t',
-                      'B: ', question[0][3], '\n', 'C: ', question[0][4], '\t', 'D: ', question[0][5])
+                QUESNO = (11 - len(ids))
+                question_data = {
+                    QUESNO: question[0][1],
+                    'A': question[0][2],
+                    'B': question[0][3],
+                    'C': question[0][4],
+                    'D': question[0][5],
+                }
+                ANSKEY = [key for key, val in question_data.items() if val == question[0][6]][0]
+                question_data.update({'ANS': ANSKEY})
+                for key, val in question_data.items():
+                    if key != 'ANS':
+                        print(f'{key}: {val}')
                 user_answer = input('\nEnter your answer: ').strip()
-                if user_answer == (question[0][6]):
+                ans_key = question_data.get('ANS')
+                if user_answer in (ans_key, question_data.get(ans_key)):
                     point += 10
                 else:
                     if user_answer not in ('exit', 'quit'):
-                        incorrect_list.append(user_answer)
+                        incorrect_list.append(f'Q{QUESNO}:{user_answer}')
                 if user_answer in ('exit', 'quit'):
                     break
             ids.remove(question_id)
@@ -153,7 +136,8 @@ if __name__ == '__main__':
         if choice == 1:
             name = input("\nEnter your name: ")
             print("\n\t\t\t===== WELCOME TO QUIZ GAME %s =====" % name.upper())
-            print("\n\t\t\tTo quit type exit or quit \n")
+            print("\t\t\tTo quit type exit or quit")
+            print("\t\t\tPlease wait loading the questions... \n")
             point, total, incorrect = get_question()
             print(f'\n\n\tWell Played "{name.upper()}" Your Score is "{point}" out of "{total*10}"')
             print(f'\n\tYour incorrect answers are {incorrect}')

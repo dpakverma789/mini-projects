@@ -57,5 +57,5 @@ while flag:
     finally:
         os.remove('result.txt')
         flag = input('\n\nContinue y/n :')
-        if flag is 'n':
+        if flag == 'n':
             flag = False
